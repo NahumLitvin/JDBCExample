@@ -11,10 +11,41 @@ public class Main {
         try {
             conn = getConnection();
             SelectWorldCountryAndPrintToScreen(conn);
+            AddAnewRowToWordCountryTable(conn);
+
+            SqlInjectionExample(conn);
+
 
         } finally {
 
             if (conn != null) conn.close();
+        }
+    }
+
+    private static void SqlInjectionExample(Connection conn) throws SQLException {
+        Statement statement = conn.createStatement();
+        String myPassword = "Secret";
+        statement.execute("SELECT * FROM users WHERE password='" + myPassword + "'");
+        //SELECT * FROM users WHERE password='Secret'
+        myPassword = "' OR 'a'='a";
+        statement.execute("SELECT * FROM users WHERE password=" + myPassword + "'");
+        //SELECT * FROM users WHERE password='' OR 'a'='a'
+    }
+
+    private static void AddAnewRowToWordCountryTable(Connection conn) throws SQLException {
+        Statement statement = null;
+        int linesUpdated;
+        try {
+            statement = conn.createStatement();
+            final String SQLQuery = "insert into world.city"
+                    + "(Name,CountryCode,District,Population)"
+                    + " values('MyNewCountry','PSE','Rafah',99999);";
+            linesUpdated = statement.executeUpdate(SQLQuery);
+            if (linesUpdated == 0) {
+                System.out.println("error");
+            }
+        } finally {
+            if (statement != null) statement.close();
         }
     }
 
