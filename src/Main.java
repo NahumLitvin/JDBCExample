@@ -35,6 +35,11 @@ public class Main {
         preparedStatement.setString(1, myPassword);
         //Throws Exception
 
+        CallableStatement cs = conn.prepareCall("{call SHOW_SUPPLIERS}");
+        ResultSet rs = cs.executeQuery();
+
+
+
     }
 
     private static void AddAnewRowToWordCountryTable(Connection conn) throws SQLException {
