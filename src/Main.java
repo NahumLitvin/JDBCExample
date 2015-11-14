@@ -18,11 +18,24 @@ public class Main {
             SpExample(conn);
             ScrollableAndUpdatable(conn);
             JdbcRowSetDemo();
+            Transaction(conn);
         } finally {
 
             if (conn != null) conn.close();
         }
     }
+
+    private static void Transaction(Connection conn) throws SQLException {
+        try {
+            conn.setAutoCommit(false);
+            //DO SQL STUFF
+            conn.commit();
+        } catch (Exception e) {
+            conn.rollback();
+        }
+
+    }
+
 
     private static void ScrollableAndUpdatable(Connection conn) throws SQLException {
         //allow moving forward/backward/edit
