@@ -12,7 +12,6 @@ public class Main {
             conn = getConnection();
             SelectWorldCountryAndPrintToScreen(conn);
             AddAnewRowToWordCountryTable(conn);
-
             SqlInjectionExample(conn);
 
 
@@ -30,6 +29,12 @@ public class Main {
         myPassword = "' OR 'a'='a";
         statement.execute("SELECT * FROM users WHERE password=" + myPassword + "'");
         //SELECT * FROM users WHERE password='' OR 'a'='a'
+        myPassword = "' OR 'a'='a";
+        PreparedStatement preparedStatement = conn.prepareStatement(
+                "SELECT * FROM users WHERE password = ?");
+        preparedStatement.setString(1, myPassword);
+        //Throws Exception
+
     }
 
     private static void AddAnewRowToWordCountryTable(Connection conn) throws SQLException {
