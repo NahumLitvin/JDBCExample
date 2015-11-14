@@ -1,3 +1,5 @@
+import com.sun.rowset.JdbcRowSetImpl;
+
 import java.sql.*;
 
 public class Main {
@@ -13,12 +15,33 @@ public class Main {
             SelectWorldCountryAndPrintToScreen(conn);
             AddAnewRowToWordCountryTable(conn);
             SqlInjectionExample(conn);
-
-
+            SpExample(conn);
+            ScrollableAndUpdatable(conn);
+            JdbcRowSetDemo();
         } finally {
 
             if (conn != null) conn.close();
         }
+    }
+
+    private static void ScrollableAndUpdatable(Connection conn) throws SQLException {
+        //allow moving forward/backward/edit
+        Statement statement = conn.createStatement(
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_UPDATABLE);
+        String sql = "SELECT * world.city";
+        ResultSet resultSet = statement.executeQuery(sql);
+        resultSet.moveToInsertRow();
+        resultSet.updateString("Name", "City");
+        resultSet.updateString("CountryCode", "PSE");
+        resultSet.updateString("District", "Hebron");
+        resultSet.updateInt("Population", 40452532);
+        resultSet.insertRow();
+    }
+
+    private static void SpExample(Connection conn) throws SQLException {
+        CallableStatement cs = conn.prepareCall("{call SHOW_SUPPLIERS}");
+        ResultSet rs = cs.executeQuery();
     }
 
     private static void SqlInjectionExample(Connection conn) throws SQLException {
@@ -35,11 +58,21 @@ public class Main {
         preparedStatement.setString(1, myPassword);
         //Throws Exception
 
-        CallableStatement cs = conn.prepareCall("{call SHOW_SUPPLIERS}");
-        ResultSet rs = cs.executeQuery();
 
+    }
 
-
+    private static void JdbcRowSetDemo() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            JdbcRowSetImpl rowSet = new JdbcRowSetImpl();
+            rowSet.setUrl("jdbc:mysql://localhost");
+            rowSet.setUsername("root");
+            rowSet.setPassword("root");
+            rowSet.setCommand("SELECT * FROM emp");
+            rowSet.execute();
+        } catch (ClassNotFoundException | SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private static void AddAnewRowToWordCountryTable(Connection conn) throws SQLException {
