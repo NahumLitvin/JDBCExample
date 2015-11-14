@@ -6,13 +6,34 @@ public class Main {
     final static String UserName = "root";
     final static String Password = "root";
     public static void main(String[] args) throws Exception{
-        Connection conn=null;
+        Connection conn = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
         try {
+            conn = getConnection();
+            statement = conn.createStatement();
+            final String SQLQuery = "SELECT * FROM world.city";
+            resultSet = statement.executeQuery(SQLQuery);
+            while (resultSet.next()) {
+                int Id = resultSet.getInt("ID");
+                String Name = resultSet.getString("Name");
+                String CountryCode = resultSet.getString("CountryCode");
+                String District = resultSet.getString("District");
+                int Population = resultSet.getInt("Population");
+                System.out.println("Id:" + Id + " Name:" + Name + " Code:" + CountryCode + " District:" + District + " Population:" + Population);
+            }
+        } finally {
+            if (resultSet != null) resultSet.close();
+            if (statement != null) statement.close();
+            if (conn != null) conn.close();
+        }
+    }
+
+    private static Connection getConnection() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
         Class.forName(DriverClassName).newInstance();
-        conn = DriverManager.getConnection(
+        return DriverManager.getConnection(
                 ServerAddress,
                 UserName,
                 Password);
-        }finally {if(conn!=null)conn.close();}
     }
 }
